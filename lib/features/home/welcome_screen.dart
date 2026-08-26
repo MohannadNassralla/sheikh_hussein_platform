@@ -21,8 +21,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   String _selectedLanguage = 'ar';
   String _selectedCountryCode = '+972';
 
-  late Future<void> _visitorFuture;
-
   final List<Map<String, String>> _countryCodes = [
     {'code': '+972', 'flag': '🇮🇱', 'name_ar': 'إسرائيل', 'name_en': 'Israel', 'name_he': 'ישראל'},
     {'code': '+962', 'flag': '🇯🇴', 'name_ar': 'الأردن', 'name_en': 'Jordan', 'name_he': 'ירדן'},
@@ -107,7 +105,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
-    _visitorFuture = _incrementVisitorCount();
+    // زيادة عدد الزوار مرة واحدة فقط عند فتح الشاشة
+    _incrementVisitorCount();
   }
 
   Future<void> _incrementVisitorCount() async {
@@ -115,6 +114,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final docRef = FirebaseFirestore.instance.collection('analytics').doc('visitors');
       await docRef.set({
         'count': FieldValue.increment(1),
+        'lastUpdated': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
     } catch (e) {
       debugPrint('Error updating visitors count: $e');
@@ -302,46 +302,41 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white.withOpacity(0.25)),
       ),
-      child: FutureBuilder<void>(
-        future: _visitorFuture,
+      child: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('analytics')
+            .doc('visitors')
+            .snapshots(),
         builder: (context, snapshot) {
-          return StreamBuilder<DocumentSnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('analytics')
-                .doc('visitors')
-                .snapshots(),
-            builder: (context, streamSnapshot) {
-              if (streamSnapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox(
-                  width: 10,
-                  height: 10,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                );
-              }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(
+              width: 10,
+              height: 10,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            );
+          }
 
-              final data = streamSnapshot.data?.data() as Map<String, dynamic>?;
-              final int count = data?['count'] ?? 0;
+          final data = snapshot.data?.data() as Map<String, dynamic>?;
+          final int count = data?['count'] ?? 0;
 
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.remove_red_eye_outlined, size: 14, color: Colors.white),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${_t('visitor_count')} ',
-                    style: const TextStyle(fontSize: 11, color: Colors.white70),
-                  ),
-                  Text(
-                    '$count',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              );
-            },
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.remove_red_eye_outlined, size: 14, color: Colors.white),
+              const SizedBox(width: 4),
+              Text(
+                '${_t('visitor_count')} ',
+                style: const TextStyle(fontSize: 11, color: Colors.white70),
+              ),
+              Text(
+                '$count',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -390,7 +385,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // رقم الهاتف (تم إصلاح المحاذاة والثبات)
+                  // رقم الهاتف
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
