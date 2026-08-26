@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -16,9 +18,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final TextEditingController _passengersCountController = TextEditingController(text: '1');
 
   String _passengerType = 'ordinary';
-  String _selectedLanguage = 'ar'; // اللغات: ar, en, he
+  String _selectedLanguage = 'ar';
+  String _selectedCountryCode = '+972';
 
-  // قاموس النصوص لجميع اللغات
+  late Future<void> _visitorFuture;
+
+  final List<Map<String, String>> _countryCodes = [
+    {'code': '+972', 'flag': '🇮🇱', 'name_ar': 'إسرائيل', 'name_en': 'Israel', 'name_he': 'ישראל'},
+    {'code': '+962', 'flag': '🇯🇴', 'name_ar': 'الأردن', 'name_en': 'Jordan', 'name_he': 'ירדן'},
+    {'code': '+970', 'flag': '🇵🇸', 'name_ar': 'فلسطين', 'name_en': 'Palestine', 'name_he': 'רשות פלסטינית'},
+    {'code': '+1', 'flag': '🇺🇸', 'name_ar': 'أمريكا', 'name_en': 'USA', 'name_he': 'ארה"ב'},
+  ];
+
   Map<String, Map<String, String>> get _localizedTexts => {
     'ar': {
       'app_title': 'منصة معبر الشيخ حسين',
@@ -27,11 +38,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'welcome_sub': 'يرجى إدخال معلوماتك الأساسية للاطلاع على كافة خدمات السفر والنقل المتوفرة.',
       'name_label': 'الاسم الكامل',
       'name_error': 'يرجى إدخال الاسم',
-      'phone_label': 'رقم الهاتف / الواتساب مع رمز الدولة',
-      'phone_hint': 'مثال: 962790000000+ أو 00962790000000',
+      'phone_label': 'رقم الهاتف (9 أرقام)',
+      'phone_hint': '525980725',
       'phone_error_empty': 'يرجى إدخال رقم الهاتف',
-      'phone_error_invalid': 'رمز الدولة مطلوب (أرقام فقط، مثال: 962790000000+)',
-      'phone_error_short': 'رقم الهاتف قصير جداً، يرجى كتابة الرقم مع رمز الدولة الكامل',
+      'phone_error_invalid': 'رقم الهاتف يجب أن يتكون من 9 أرقام فقط',
       'passenger_type': 'صفة المسافر',
       'type_ordinary': 'مسافر (إسرائيلي، عرب 48)',
       'type_jerusalem': 'مواطن مقدسي (بطاقات خاصة)',
@@ -42,6 +52,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'bridge_name': 'جسر الشيخ حسين\n(معبر نهر الأردن)',
       'bridge_desc': 'البوابة الشمالية الرئيسية للربط والنقل بين الأردن وإسرائيل. توفر المنصة خدمات حجز السيارات الخاصة، VIP، واستقبال الجروبات بكفاءة وسرعة.',
       'close': 'إغلاق',
+      'visitor_count': 'الزوار:',
     },
     'en': {
       'app_title': 'Sheikh Hussein Border Platform',
@@ -50,11 +61,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'welcome_sub': 'Please enter your basic info to explore available travel & transport services.',
       'name_label': 'Full Name',
       'name_error': 'Please enter your name',
-      'phone_label': 'Phone / WhatsApp with Country Code',
-      'phone_hint': 'e.g. +962790000000 or 00962790000000',
+      'phone_label': 'Phone Number (9 digits)',
+      'phone_hint': '525980725',
       'phone_error_empty': 'Please enter phone number',
-      'phone_error_invalid': 'Country code required (Numbers only, e.g. +962790000000)',
-      'phone_error_short': 'Phone number too short, include country code',
+      'phone_error_invalid': 'Phone number must be exactly 9 digits',
       'passenger_type': 'Passenger Category',
       'type_ordinary': 'Passenger (Israeli / 48 Arabs)',
       'type_jerusalem': 'Jerusalem Resident (Special IDs)',
@@ -65,6 +75,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'bridge_name': 'Sheikh Hussein Bridge\n(Jordan River Crossing)',
       'bridge_desc': 'The main northern border connecting Jordan and Israel. Providing private transport, VIP, and group services efficiently.',
       'close': 'Close',
+      'visitor_count': 'Visitors:',
     },
     'he': {
       'app_title': 'פלטפורמת מעבר שייח חוסיין',
@@ -73,11 +84,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'welcome_sub': 'אנא הזן את פרטיך הבסיסיים כדי לצפות בכל שירותי הנסיעות והתחבורה.',
       'name_label': 'שם מלא',
       'name_error': 'נא להזין שם',
-      'phone_label': 'מספר טלפון / וואטסאפ כולל קידומת בינלאומית',
-      'phone_hint': 'לדוגמה: 962790000000+ או 00962790000000',
+      'phone_label': 'מספר טלפון (9 ספרות)',
+      'phone_hint': '525980725',
       'phone_error_empty': 'נא להזין מספר טלפון',
-      'phone_error_invalid': 'חובה לכלול קידומת מדינה (מספרים בלבד)',
-      'phone_error_short': 'מספר הטלפון קצר מדי, נא לכלול קידומת בינלאומית מלאה',
+      'phone_error_invalid': 'מספר הטלפון חייב להכיל 9 ספרות בדיוק',
       'passenger_type': 'סוג נוסע',
       'type_ordinary': 'נוסע (ישראלי / ערביי 48)',
       'type_jerusalem': 'תושב ירושלים (תעודות מיוחדות)',
@@ -88,10 +98,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'bridge_name': 'גשר שייח חוסיין\n(מעבר נהר הירדן)',
       'bridge_desc': 'מעבר הגבול הצפוני הראשי המחבר בין ירדן לישראל. מספק שירותי הסעות פרטיות, VIP וקבוצות ביעילות.',
       'close': 'סגור',
+      'visitor_count': 'מבקרים:',
     },
   };
 
   String _t(String key) => _localizedTexts[_selectedLanguage]?[key] ?? key;
+
+  @override
+  void initState() {
+    super.initState();
+    _visitorFuture = _incrementVisitorCount();
+  }
+
+  Future<void> _incrementVisitorCount() async {
+    try {
+      final docRef = FirebaseFirestore.instance.collection('analytics').doc('visitors');
+      await docRef.set({
+        'count': FieldValue.increment(1),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('Error updating visitors count: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -101,7 +129,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     super.dispose();
   }
 
-  // دالة المساعدة لفتح الاتصال الهاتفي أو تطبيق واتساب
   Future<void> _launchUrl(String urlString) async {
     final Uri uri = Uri.parse(urlString);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -127,8 +154,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: [
             const Text('تواصل معنا / Contact Us / צור קשר:'),
             const SizedBox(height: 16),
-
-            // خيار الاتصال الهاتفي المباشر
             InkWell(
               onTap: () => _launchUrl('tel:+962772932636'),
               borderRadius: BorderRadius.circular(8),
@@ -147,8 +172,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
             ),
             const Divider(height: 16),
-
-            // خيار المراسلة عبر واتساب
             InkWell(
               onTap: () => _launchUrl('https://wa.me/972525980725'),
               borderRadius: BorderRadius.circular(8),
@@ -191,34 +214,63 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           backgroundColor: const Color(0xFF1E3A8A),
           foregroundColor: Colors.white,
           elevation: 0,
-          title: Text(_t('app_title'), style: const TextStyle(fontSize: 18)),
+          title: Text(
+            _t('app_title'),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            overflow: TextOverflow.ellipsis,
+          ),
           actions: [
-            TextButton.icon(
-              onPressed: () => _showContactUsDialog(context),
-              icon: const Icon(Icons.headset_mic, color: Colors.white, size: 20),
-              label: Text(_t('contact_us'), style: const TextStyle(color: Colors.white)),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildAppBarVisitorBadge(),
+                    const SizedBox(width: 6),
+                    InkWell(
+                      onTap: () => _showContactUsDialog(context),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.headset_mic, color: Colors.white, size: 18),
+                            const SizedBox(width: 4),
+                            Text(
+                              _t('contact_us'),
+                              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    PopupMenuButton<String>(
+                      padding: EdgeInsets.zero,
+                      icon: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.language, color: Colors.white, size: 20),
+                          Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
+                        ],
+                      ),
+                      onSelected: (String lang) {
+                        setState(() {
+                          _selectedLanguage = lang;
+                        });
+                      },
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(value: 'ar', child: Text('🇸🇦 العربية')),
+                        const PopupMenuItem<String>(value: 'en', child: Text('🇬🇧 English')),
+                        const PopupMenuItem<String>(value: 'he', child: Text('🇮🇱 עברית')),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(width: 8),
-            PopupMenuButton<String>(
-              icon: const Row(
-                children: [
-                  Icon(Icons.language, color: Colors.white),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_drop_down, color: Colors.white),
-                ],
-              ),
-              onSelected: (String lang) {
-                setState(() {
-                  _selectedLanguage = lang;
-                });
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(value: 'ar', child: Text('🇸🇦 العربية')),
-                const PopupMenuItem<String>(value: 'en', child: Text('🇬🇧 English')),
-                const PopupMenuItem<String>(value: 'he', child: Text('🇮🇱 עברית')),
-              ],
-            ),
-            const SizedBox(width: 12),
           ],
         ),
         body: SafeArea(
@@ -238,6 +290,60 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAppBarVisitorBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(0.25)),
+      ),
+      child: FutureBuilder<void>(
+        future: _visitorFuture,
+        builder: (context, snapshot) {
+          return StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('analytics')
+                .doc('visitors')
+                .snapshots(),
+            builder: (context, streamSnapshot) {
+              if (streamSnapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox(
+                  width: 10,
+                  height: 10,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                );
+              }
+
+              final data = streamSnapshot.data?.data() as Map<String, dynamic>?;
+              final int count = data?['count'] ?? 0;
+
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.remove_red_eye_outlined, size: 14, color: Colors.white),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${_t('visitor_count')} ',
+                    style: const TextStyle(fontSize: 11, color: Colors.white70),
+                  ),
+                  Text(
+                    '$count',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -284,38 +390,69 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // رقم الهاتف
-                  TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: _t('phone_label'),
-                      hintText: _t('phone_hint'),
-                      hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400),
-                      prefixIcon: const Icon(Icons.phone_android),
-                      border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return _t('phone_error_empty');
-                      }
-
-                      final cleanPhone = value.trim();
-
-                      // التحقق من صيغة الهاتف مع الرمز الدولي (+ أو أرقام فقط)
-                      final phoneRegex = RegExp(r'^(\+|\d)[0-9]{7,15}$');
-                      if (!phoneRegex.hasMatch(cleanPhone) || RegExp(r'[a-zA-Z\u0600-\u06FF]').hasMatch(cleanPhone)) {
-                        return _t('phone_error_invalid');
-                      }
-
-                      // التحقق من أن الطول يحتوي على رمز الدولة بالإضافة للرقم المحلي (8 أرقام على الأقل)
-                      if (cleanPhone.replaceAll('+', '').length < 8) {
-                        return _t('phone_error_short');
-                      }
-
-                      return null;
-                    },
+                  // رقم الهاتف (تم إصلاح المحاذاة والثبات)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        child: DropdownButtonFormField<String>(
+                          value: _selectedCountryCode,
+                          isExpanded: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                          ),
+                          items: _countryCodes.map((country) {
+                            return DropdownMenuItem<String>(
+                              value: country['code'],
+                              child: Text(
+                                '${country['flag']} ${country['code']}',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                textDirection: TextDirection.ltr,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => _selectedCountryCode = val);
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: TextFormField(
+                            controller: _phoneController,
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.left,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(9),
+                            ],
+                            decoration: InputDecoration(
+                              labelText: _t('phone_label'),
+                              hintText: _t('phone_hint'),
+                              hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+                              border: const OutlineInputBorder(),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return _t('phone_error_empty');
+                              }
+                              final cleanPhone = value.trim();
+                              if (cleanPhone.length != 9) {
+                                return _t('phone_error_invalid');
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 10),
 
@@ -347,6 +484,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   TextFormField(
                     controller: _passengersCountController,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                     decoration: InputDecoration(
                       labelText: _t('passengers_count'),
                       prefixIcon: const Icon(Icons.group_outlined),
@@ -366,7 +506,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // زر الانتقال لتمرير البيانات إلى HomeScreen
+                  // زر الانتقال
                   SizedBox(
                     width: double.infinity,
                     height: 44,
@@ -378,12 +518,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+                          final fullPhoneNumber = '$_selectedCountryCode${_phoneController.text.trim()}';
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => HomeScreen(
                                 userName: _nameController.text.trim(),
-                                userPhone: _phoneController.text.trim(),
+                                userPhone: fullPhoneNumber,
                                 passengerType: _passengerType,
                                 passengersCount: int.parse(_passengersCountController.text.trim()),
                                 initialLanguage: _selectedLanguage,

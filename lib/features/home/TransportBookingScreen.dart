@@ -65,12 +65,12 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
       'van_10': 'فان (حتى 10 أشخاص)',
       'none_vehicle': 'بدون وسيلة نقل',
       'direction': 'اتجاه الرحلة',
-      'dir_border_to_amman_deadsea': 'من معبر الشيخ حسين ⬅ إلى عمان أو البحر الميت',
-      'dir_border_to_airport': 'من معبر الشيخ حسين ⬅ إلى مطار الملكة علياء',
-      'dir_border_to_aqaba': 'من معبر الشيخ حسين ⬅ إلى العقبة',
-      'dir_airport_to_border': 'من مطار الملكة علياء ⬅ إلى معبر الشيخ حسين',
-      'dir_amman_deadsea_to_border': 'من عمان أو البحر الميت ⬅ إلى معبر الشيخ حسين',
-      'dir_aqaba_to_border': 'من العقبة ⬅ إلى معبر الشيخ حسين',
+      'dir_border_to_amman_deadsea': 'من المعبر ⬅ إلى عمان / البحر الميت',
+      'dir_border_to_airport': 'من المعبر ⬅ إلى مطار الملكة علياء',
+      'dir_border_to_aqaba': 'من المعبر ⬅ إلى العقبة',
+      'dir_airport_to_border': 'من مطار الملكة علياء ⬅ إلى المعبر',
+      'dir_amman_deadsea_to_border': 'من عمان / البحر الميت ⬅ إلى المعبر',
+      'dir_aqaba_to_border': 'من العقبة ⬅ إلى المعبر',
       'travel_date': 'تاريخ السفر / العبور',
       'notes_label': 'ملاحظات إضافية (اختياري)',
       'notes_hint': 'مثال: موعد الوصول، رقم الرحلة، عدد الحقائب...',
@@ -79,7 +79,8 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
       'transport_cost': 'تكلفة النقل:',
       'free_drink': '🍹 مشمول: مشروب بارد مجاناً مع النقل',
       'total_cost': 'المجموع الكلي:',
-      'jod': 'دينار أردني',
+      'jod': 'د.أ',
+      'jod_full': 'دينار أردني',
       'btn_confirm': 'تأكيد وحفظ الحجز',
       'success_msg': 'تم حفظ الحجز بنجاح!',
       'error_msg': 'حدث خطأ أثناء حفظ البيانات، يرجى المحاولة لاحقاً.',
@@ -94,12 +95,12 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
       'van_10': 'Van (Up to 10 persons)',
       'none_vehicle': 'No Transport Required',
       'direction': 'Trip Direction',
-      'dir_border_to_amman_deadsea': 'From Sheikh Hussein Border ⬅ To Amman / Dead Sea',
-      'dir_border_to_airport': 'From Sheikh Hussein Border ⬅ To Queen Alia Airport',
-      'dir_border_to_aqaba': 'From Sheikh Hussein Border ⬅ To Aqaba',
-      'dir_airport_to_border': 'From Queen Alia Airport ⬅ To Sheikh Hussein Border',
-      'dir_amman_deadsea_to_border': 'From Amman / Dead Sea ⬅ To Sheikh Hussein Border',
-      'dir_aqaba_to_border': 'From Aqaba ⬅ To Sheikh Hussein Border',
+      'dir_border_to_amman_deadsea': 'From Border ⬅ To Amman / Dead Sea',
+      'dir_border_to_airport': 'From Border ⬅ To Queen Alia Airport',
+      'dir_border_to_aqaba': 'From Border ⬅ To Aqaba',
+      'dir_airport_to_border': 'From Queen Alia Airport ⬅ To Border',
+      'dir_amman_deadsea_to_border': 'From Amman / Dead Sea ⬅ To Border',
+      'dir_aqaba_to_border': 'From Aqaba ⬅ To Border',
       'travel_date': 'Travel Date',
       'notes_label': 'Additional Notes (Optional)',
       'notes_hint': 'e.g. Arrival time, flight number, luggage count...',
@@ -109,6 +110,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
       'free_drink': '🍹 Included: Complimentary Cold Drink with Transport',
       'total_cost': 'Total Price:',
       'jod': 'JOD',
+      'jod_full': 'JOD',
       'btn_confirm': 'Confirm & Save Booking',
       'success_msg': 'Booking saved successfully!',
       'error_msg': 'An error occurred while saving, please try again.',
@@ -123,12 +125,12 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
       'van_10': 'ואן (עד 10 נוסעים)',
       'none_vehicle': 'ללא הסעה',
       'direction': 'כיוון הנסיעה',
-      'dir_border_to_amman_deadsea': 'ממעבר שייח חוסיין ⬅ לעמאן / ים המלח',
-      'dir_border_to_airport': 'ממעבר שייח חוסיין ⬅ לנמל התעופה קווין עליאה',
-      'dir_border_to_aqaba': 'ממעבר שייח חוסיין ⬅ לעקבה',
-      'dir_airport_to_border': 'מנמל התעופה קווין עליאה ⬅ למעבר שייח חוסיין',
-      'dir_amman_deadsea_to_border': 'מעמאן / ים המלח ⬅ למעבר שייח חוסיין',
-      'dir_aqaba_to_border': 'מעקבה ⬅ למעבר שייח חוסיין',
+      'dir_border_to_amman_deadsea': 'מהמעבר ⬅ לעמאן / ים המלח',
+      'dir_border_to_airport': 'מהמעבר ⬅ לנמל התעופה קווין עליאה',
+      'dir_border_to_aqaba': 'מהמעבר ⬅ לעקבה',
+      'dir_airport_to_border': 'מנמל התעופה קווין עליאה ⬅ למעבר',
+      'dir_amman_deadsea_to_border': 'מעמאן / ים המלח ⬅ למעבר',
+      'dir_aqaba_to_border': 'מעקבה ⬅ למעבר',
       'travel_date': 'תאריך נסיעה',
       'notes_label': 'הערות נוספות (רשות)',
       'notes_hint': 'לדוגמה: שעת הגעה, מספר טיסה, מספר מזוודות...',
@@ -138,6 +140,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
       'free_drink': '🍹 כולל: שתייה קרה חינם עם ההסעה',
       'total_cost': 'סה"כ לתשלום:',
       'jod': 'דינר',
+      'jod_full': 'דינר',
       'btn_confirm': 'אישור ושמירת הזמנה',
       'success_msg': 'ההזמנה נשמרה בהצלחה!',
       'error_msg': 'אירעה שגיאה בשמירת הנתונים, נסה שוב מאוחר יותר.',
@@ -165,6 +168,15 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
   }
 
   int get _totalPrice => _visaAndEscortCost + _transportCost;
+
+  List<Map<String, String>> get _directionsList => [
+    {'key': 'border_to_amman_deadsea', 'text': _t('dir_border_to_amman_deadsea')},
+    {'key': 'border_to_airport', 'text': _t('dir_border_to_airport')},
+    {'key': 'border_to_aqaba', 'text': _t('dir_border_to_aqaba')},
+    {'key': 'airport_to_border', 'text': _t('dir_airport_to_border')},
+    {'key': 'amman_deadsea_to_border', 'text': _t('dir_amman_deadsea_to_border')},
+    {'key': 'aqaba_to_border', 'text': _t('dir_aqaba_to_border')},
+  ];
 
   Future<void> _pickDate() async {
     final DateTime? picked = await showDatePicker(
@@ -318,32 +330,31 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
                     ),
                     items: _selectedVehicle == 'none'
                         ? null
-                        : [
-                      DropdownMenuItem(
-                        value: 'border_to_amman_deadsea',
-                        child: Text('${_t('dir_border_to_amman_deadsea')} (${_getDirectionPrice('border_to_amman_deadsea')} ${_t('jod')})', overflow: TextOverflow.ellipsis),
-                      ),
-                      DropdownMenuItem(
-                        value: 'border_to_airport',
-                        child: Text('${_t('dir_border_to_airport')} (${_getDirectionPrice('border_to_airport')} ${_t('jod')})', overflow: TextOverflow.ellipsis),
-                      ),
-                      DropdownMenuItem(
-                        value: 'border_to_aqaba',
-                        child: Text('${_t('dir_border_to_aqaba')} (${_getDirectionPrice('border_to_aqaba')} ${_t('jod')})', overflow: TextOverflow.ellipsis),
-                      ),
-                      DropdownMenuItem(
-                        value: 'airport_to_border',
-                        child: Text('${_t('dir_airport_to_border')} (${_getDirectionPrice('airport_to_border')} ${_t('jod')})', overflow: TextOverflow.ellipsis),
-                      ),
-                      DropdownMenuItem(
-                        value: 'amman_deadsea_to_border',
-                        child: Text('${_t('dir_amman_deadsea_to_border')} (${_getDirectionPrice('amman_deadsea_to_border')} ${_t('jod')})', overflow: TextOverflow.ellipsis),
-                      ),
-                      DropdownMenuItem(
-                        value: 'aqaba_to_border',
-                        child: Text('${_t('dir_aqaba_to_border')} (${_getDirectionPrice('aqaba_to_border')} ${_t('jod')})', overflow: TextOverflow.ellipsis),
-                      ),
-                    ],
+                        : _directionsList.map((dir) {
+                      final price = _getDirectionPrice(dir['key']!);
+                      return DropdownMenuItem<String>(
+                        value: dir['key'],
+                        child: Text(
+                          '${dir['text']} ($price ${_t('jod')})',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      );
+                    }).toList(),
+                    selectedItemBuilder: _selectedVehicle == 'none'
+                        ? null
+                        : (BuildContext context) {
+                      return _directionsList.map((dir) {
+                        final price = _getDirectionPrice(dir['key']!);
+                        return Text(
+                          '${dir['text']} ($price ${_t('jod')})',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                        );
+                      }).toList();
+                    },
                     onChanged: _selectedVehicle == 'none'
                         ? null
                         : (val) => setState(() => _selectedDirection = val),
@@ -404,7 +415,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(_t('escort_visa_cost')),
-                              Text('$_visaAndEscortCost ${_t('jod')}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                              Text('$_visaAndEscortCost ${_t('jod_full')}', style: const TextStyle(fontWeight: FontWeight.w600)),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -412,7 +423,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(_t('transport_cost')),
-                              Text('$_transportCost ${_t('jod')}', style: const TextStyle(fontWeight: FontWeight.w600)),
+                              Text('$_transportCost ${_t('jod_full')}', style: const TextStyle(fontWeight: FontWeight.w600)),
                             ],
                           ),
                           if (_selectedVehicle != 'none') ...[
@@ -431,7 +442,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
                               ),
                               Text(
-                                '$_totalPrice ${_t('jod')}',
+                                '$_totalPrice ${_t('jod_full')}',
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
                               ),
                             ],

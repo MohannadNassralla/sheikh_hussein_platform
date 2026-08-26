@@ -257,6 +257,21 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> hotelsList = [
+      {'value': 'siraj_amman', 'label': _t('hotel_siraj')},
+      {'value': 'days_inn_amman', 'label': _t('hotel_days_inn')},
+      {'value': 'mena_aqaba', 'label': _t('hotel_mena_aqaba')},
+      {'value': 'ajnadin_irbid', 'label': _t('hotel_ajnadin_irbid')},
+      {'value': 'moab_madaba', 'label': _t('hotel_moab_madaba')},
+    ];
+
+    final List<Map<String, String>> roomTypesList = [
+      {'value': 'single', 'label': '${_t('room_single')} - (${_hotelRoomPrices[_selectedHotel]?['single']} ${_t('jod')})'},
+      {'value': 'double', 'label': '${_t('room_double')} - (${_hotelRoomPrices[_selectedHotel]?['double']} ${_t('jod')})'},
+      {'value': 'triple', 'label': '${_t('room_triple')} - (${_hotelRoomPrices[_selectedHotel]?['triple']} ${_t('jod')})'},
+      {'value': 'suite', 'label': '${_t('room_suite')} - (${_hotelRoomPrices[_selectedHotel]?['suite']} ${_t('jod')})'},
+    ];
+
     return Directionality(
       textDirection: widget.currentLanguage == 'he' || widget.currentLanguage == 'ar'
           ? TextDirection.rtl
@@ -300,17 +315,35 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
                   DropdownButtonFormField<String>(
                     value: _selectedHotel,
                     isExpanded: true,
+                    menuMaxHeight: 350,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     ),
-                    items: [
-                      DropdownMenuItem(value: 'siraj_amman', child: Text(_t('hotel_siraj'))),
-                      DropdownMenuItem(value: 'days_inn_amman', child: Text(_t('hotel_days_inn'))),
-                      DropdownMenuItem(value: 'mena_aqaba', child: Text(_t('hotel_mena_aqaba'))),
-                      DropdownMenuItem(value: 'ajnadin_irbid', child: Text(_t('hotel_ajnadin_irbid'))),
-                      DropdownMenuItem(value: 'moab_madaba', child: Text(_t('hotel_moab_madaba'))),
-                    ],
+                    selectedItemBuilder: (BuildContext context) {
+                      return hotelsList.map<Widget>((item) {
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            item['label']!,
+                            maxLines: 2,
+                            overflow: TextOverflow.visible,
+                            style: const TextStyle(fontSize: 13, height: 1.2),
+                          ),
+                        );
+                      }).toList();
+                    },
+                    items: hotelsList.map((item) {
+                      return DropdownMenuItem<String>(
+                        value: item['value'],
+                        child: Text(
+                          item['label']!,
+                          maxLines: 2,
+                          softWrap: true,
+                          style: const TextStyle(fontSize: 13, height: 1.2),
+                        ),
+                      );
+                    }).toList(),
                     onChanged: (val) {
                       setState(() {
                         _selectedHotel = val!;
@@ -325,28 +358,35 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
                   DropdownButtonFormField<String>(
                     value: _roomType,
                     isExpanded: true,
+                    menuMaxHeight: 350,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     ),
-                    items: [
-                      DropdownMenuItem(
-                        value: 'single',
-                        child: Text('${_t('room_single')} - (${_hotelRoomPrices[_selectedHotel]?['single']} ${_t('jod')})'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'double',
-                        child: Text('${_t('room_double')} - (${_hotelRoomPrices[_selectedHotel]?['double']} ${_t('jod')})'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'triple',
-                        child: Text('${_t('room_triple')} - (${_hotelRoomPrices[_selectedHotel]?['triple']} ${_t('jod')})'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'suite',
-                        child: Text('${_t('room_suite')} - (${_hotelRoomPrices[_selectedHotel]?['suite']} ${_t('jod')})'),
-                      ),
-                    ],
+                    selectedItemBuilder: (BuildContext context) {
+                      return roomTypesList.map<Widget>((item) {
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            item['label']!,
+                            maxLines: 2,
+                            overflow: TextOverflow.visible,
+                            style: const TextStyle(fontSize: 13, height: 1.2),
+                          ),
+                        );
+                      }).toList();
+                    },
+                    items: roomTypesList.map((item) {
+                      return DropdownMenuItem<String>(
+                        value: item['value'],
+                        child: Text(
+                          item['label']!,
+                          maxLines: 2,
+                          softWrap: true,
+                          style: const TextStyle(fontSize: 13, height: 1.2),
+                        ),
+                      );
+                    }).toList(),
                     onChanged: (val) => setState(() => _roomType = val!),
                   ),
                   const SizedBox(height: 18),
