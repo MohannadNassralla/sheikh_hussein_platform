@@ -31,8 +31,8 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
 
   bool _isLoading = false;
 
-  // ثابت سعر المندوب والتأشيرة لكل شخص
-  static const int visaAndEscortFeePerPerson = 45;
+  // ثابت سعر المندوب والتأشيرة لكل شخص (تم التعديل إلى 35)
+  static const int visaAndEscortFeePerPerson = 35;
 
   // قائمة أسعار السيارات الخاصة (حتى 4 أشخاص)
   final Map<String, int> _carPrices = {
