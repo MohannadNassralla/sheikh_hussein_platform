@@ -53,8 +53,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'visitor_count': 'الزوار:',
     },
     'en': {
-      'app_title': 'Sheikh Hussein Border Platform',
-      'contact_us': 'Contact Us',
+      'app_title': 'Sheikh Hussein Platform',
+      'contact_us': 'Contact',
       'welcome_title': 'Welcome to Sheikh Hussein Platform',
       'welcome_sub': 'Please enter your basic info to explore available travel & transport services.',
       'name_label': 'Full Name',
@@ -76,7 +76,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'visitor_count': 'Visitors:',
     },
     'he': {
-      'app_title': 'פלטפורמת מעבר שייח חוסיין',
+      'app_title': 'מעבר שייח חוסיין',
       'contact_us': 'צור קשר',
       'welcome_title': 'ברוכים הבאים למעבר שייח חוסיין',
       'welcome_sub': 'אנא הזן את פרטיך הבסיסיים כדי לצפות בכל שירותי הנסיעות והתחבורה.',
@@ -105,7 +105,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
-    // زيادة عدد الزوار مرة واحدة فقط عند فتح الشاشة
     _incrementVisitorCount();
   }
 
@@ -203,7 +202,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 800;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 800;
 
     return Directionality(
       textDirection: _selectedLanguage == 'he' || _selectedLanguage == 'ar'
@@ -214,63 +214,36 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           backgroundColor: const Color(0xFF1E3A8A),
           foregroundColor: Colors.white,
           elevation: 0,
+          titleSpacing: 12,
           title: Text(
             _t('app_title'),
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: screenWidth < 380 ? 13 : 15,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildAppBarVisitorBadge(),
-                    const SizedBox(width: 6),
-                    InkWell(
-                      onTap: () => _showContactUsDialog(context),
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.headset_mic, color: Colors.white, size: 18),
-                            const SizedBox(width: 4),
-                            Text(
-                              _t('contact_us'),
-                              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    PopupMenuButton<String>(
-                      padding: EdgeInsets.zero,
-                      icon: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.language, color: Colors.white, size: 20),
-                          Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
-                        ],
-                      ),
-                      onSelected: (String lang) {
-                        setState(() {
-                          _selectedLanguage = lang;
-                        });
-                      },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(value: 'ar', child: Text('🇸🇦 العربية')),
-                        const PopupMenuItem<String>(value: 'en', child: Text('🇬🇧 English')),
-                        const PopupMenuItem<String>(value: 'he', child: Text('🇮🇱 עברית')),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+            _buildAppBarVisitorBadge(compact: screenWidth < 400),
+            IconButton(
+              icon: const Icon(Icons.headset_mic, color: Colors.white, size: 20),
+              tooltip: _t('contact_us'),
+              onPressed: () => _showContactUsDialog(context),
             ),
-            const SizedBox(width: 8),
+            PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.language, color: Colors.white, size: 20),
+              onSelected: (String lang) {
+                setState(() {
+                  _selectedLanguage = lang;
+                });
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(value: 'ar', child: Text('🇸🇦 العربية')),
+                const PopupMenuItem<String>(value: 'en', child: Text('🇬🇧 English')),
+                const PopupMenuItem<String>(value: 'he', child: Text('🇮🇱 עברית')),
+              ],
+            ),
+            const SizedBox(width: 4),
           ],
         ),
         body: SafeArea(
@@ -294,9 +267,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  Widget _buildAppBarVisitorBadge() {
+  Widget _buildAppBarVisitorBadge({bool compact = false}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
@@ -322,16 +296,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.remove_red_eye_outlined, size: 14, color: Colors.white),
-              const SizedBox(width: 4),
-              Text(
-                '${_t('visitor_count')} ',
-                style: const TextStyle(fontSize: 11, color: Colors.white70),
-              ),
+              const Icon(Icons.remove_red_eye_outlined, size: 13, color: Colors.white),
+              const SizedBox(width: 3),
+              if (!compact) ...[
+                Text(
+                  '${_t('visitor_count')} ',
+                  style: const TextStyle(fontSize: 10, color: Colors.white70),
+                ),
+              ],
               Text(
                 '$count',
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),

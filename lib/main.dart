@@ -24,6 +24,14 @@ class SheikhHusseinApp extends StatelessWidget {
       title: 'Sheikh Hussein Border Platform',
       theme: ThemeData(
         primaryColor: const Color(0xFF1E3A8A),
+        fontFamily: 'Cairo',
+        // استخدام خطوط نظام بديلة يدعم معظمها اللغة العربية فوراً لحين اكتمال التحميل الشبكي
+        fontFamilyFallback: const [
+          'Segoe UI',
+          'Tahoma',
+          'Arial',
+          'sans-serif',
+        ],
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF1E3A8A),
         ),

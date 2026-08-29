@@ -32,7 +32,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _selectedLanguage = widget.initialLanguage;
   }
 
-  // قاموس النصوص لصفحة الـ Home
   Map<String, Map<String, String>> get _localizedTexts => {
     'ar': {
       'app_title': 'منصة معبر الشيخ حسين',
@@ -80,7 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _t(String key) => _localizedTexts[_selectedLanguage]?[key] ?? key;
 
-  // دالة المساعدة لفتح الاتصال الهاتفي أو تطبيق واتساب
   Future<void> _launchUrl(String urlString) async {
     final Uri uri = Uri.parse(urlString);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -106,8 +104,6 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const Text('تواصل معنا / Contact Us / צור קשר:'),
             const SizedBox(height: 16),
-
-            // خيار الاتصال الهاتفي المباشر
             InkWell(
               onTap: () => _launchUrl('tel:+962772932636'),
               borderRadius: BorderRadius.circular(8),
@@ -126,8 +122,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const Divider(height: 16),
-
-            // خيار المراسلة عبر واتساب
             InkWell(
               onTap: () => _launchUrl('https://wa.me/972525980725'),
               borderRadius: BorderRadius.circular(8),
@@ -159,6 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Directionality(
       textDirection: _selectedLanguage == 'he' || _selectedLanguage == 'ar'
           ? TextDirection.rtl
@@ -168,22 +164,25 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: const Color(0xFF1E3A8A),
           foregroundColor: Colors.white,
           elevation: 0,
-          title: Text(_t('app_title'), style: const TextStyle(fontSize: 18)),
-          actions: [
-            TextButton.icon(
-              onPressed: () => _showContactUsDialog(context),
-              icon: const Icon(Icons.headset_mic, color: Colors.white, size: 20),
-              label: Text(_t('contact_us'), style: const TextStyle(color: Colors.white)),
+          titleSpacing: 8,
+          title: Text(
+            _t('app_title'),
+            style: TextStyle(
+              fontSize: screenWidth < 380 ? 13 : 15,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(width: 8),
+            overflow: TextOverflow.ellipsis,
+          ),
+          actions: [
+            // زر الاتصال في الهيدر تم تبسيطه لضمان عدم ضغط العنوان
+            IconButton(
+              icon: const Icon(Icons.headset_mic, color: Colors.white, size: 20),
+              tooltip: _t('contact_us'),
+              onPressed: () => _showContactUsDialog(context),
+            ),
             PopupMenuButton<String>(
-              icon: const Row(
-                children: [
-                  Icon(Icons.language, color: Colors.white),
-                  SizedBox(width: 4),
-                  Icon(Icons.arrow_drop_down, color: Colors.white),
-                ],
-              ),
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.language, color: Colors.white, size: 20),
               onSelected: (String lang) {
                 setState(() {
                   _selectedLanguage = lang;
@@ -195,19 +194,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 const PopupMenuItem<String>(value: 'he', child: Text('🇮🇱 עברית')),
               ],
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 4),
           ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // الهيدر الترحيبي مع عرض اسم المسافر الممرر
+                // الهيدر الترحيبي
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(20.0),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E3A8A),
                     borderRadius: BorderRadius.circular(12),
@@ -219,17 +218,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         '${_t('welcome_user')}${widget.userName}',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         _t('home_sub'),
-                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        style: const TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                       const SizedBox(height: 12),
-                      // شارة توضح عدد المسافرين المسجل
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
@@ -238,27 +236,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: Text(
                           '${_t('passengers_info')}${widget.passengersCount}',
-                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500),
+                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
 
-                // عنوان الخدمات
                 Text(
                   _t('services_title'),
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1E3A8A),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
-                // خدمة تأشيرة الدخول مع مندوب ووسيلة النقل
-                _buildServiceCard(
+                // خدمة التأشيرة والنقل
+                _buildResponsiveServiceCard(
                   icon: Icons.assignment_ind_rounded,
                   title: _t('transport_visa_escort_service'),
                   description: _t('transport_visa_escort_desc'),
@@ -279,8 +276,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // خدمة الفنادق والإقامة
-                _buildServiceCard(
+                // خدمة الفنادق
+                _buildResponsiveServiceCard(
                   icon: Icons.hotel_rounded,
                   title: _t('hotel_service'),
                   description: _t('hotel_desc'),
@@ -307,7 +304,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildServiceCard({
+  // بطاقة خدمة متجاوبة تعمل بكفاءة على الشاشات الصغرى والكبرى بكل اللغات
+  Widget _buildResponsiveServiceCard({
     required IconData icon,
     required String title,
     required String description,
@@ -315,50 +313,108 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E3A8A).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: const Color(0xFF1E3A8A), size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isNarrow = constraints.maxWidth < 450;
+
+            if (isNarrow) {
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E3A8A),
-                    ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1E3A8A).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(icon, color: const Color(0xFF1E3A8A), size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1E3A8A),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 10),
                   Text(
                     description,
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13, height: 1.4),
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 40,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1E3A8A),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: onPressed,
+                      child: Text(_t('book_now'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
                   ),
                 ],
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E3A8A),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-              ),
-              onPressed: onPressed,
-              child: Text(_t('book_now')),
-            ),
-          ],
+              );
+            }
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E3A8A).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: const Color(0xFF1E3A8A), size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E3A8A),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        description,
+                        style: TextStyle(color: Colors.grey.shade700, fontSize: 13, height: 1.3),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E3A8A),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: onPressed,
+                  child: Text(_t('book_now')),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
