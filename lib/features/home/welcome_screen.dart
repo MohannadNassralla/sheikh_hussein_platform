@@ -215,28 +215,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           foregroundColor: Colors.white,
           elevation: 0,
           titleSpacing: 8,
-          title: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerRight,
-            child: Text(
-              _t('app_title'),
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-              ),
+          title: Text(
+            _t('app_title'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: screenWidth < 400 ? 13 : 15,
+              fontWeight: FontWeight.bold,
             ),
           ),
           actions: [
-            _buildAppBarVisitorBadge(compact: screenWidth < 420),
+            if (screenWidth > 400)
+              Flexible(
+                fit: FlexFit.loose,
+                child: _buildAppBarVisitorBadge(compact: screenWidth < 480),
+              ),
             IconButton(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              constraints: const BoxConstraints(),
               icon: const Icon(Icons.headset_mic, color: Colors.white, size: 20),
               tooltip: _t('contact_us'),
               onPressed: () => _showContactUsDialog(context),
             ),
             PopupMenuButton<String>(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
               icon: const Icon(Icons.language, color: Colors.white, size: 20),
               onSelected: (String lang) {
                 setState(() {
@@ -249,7 +248,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const PopupMenuItem<String>(value: 'he', child: Text('🇮🇱 עברית')),
               ],
             ),
-            const SizedBox(width: 4),
           ],
         ),
         body: SafeArea(
@@ -275,7 +273,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Widget _buildAppBarVisitorBadge({bool compact = false}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
@@ -302,8 +300,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           return Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.remove_red_eye_outlined, size: 13, color: Colors.white),
-              const SizedBox(width: 3),
+              const Icon(Icons.remove_red_eye_outlined, size: 12, color: Colors.white),
+              const SizedBox(width: 4),
               if (!compact) ...[
                 Text(
                   '${_t('visitor_count')} ',
