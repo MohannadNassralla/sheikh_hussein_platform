@@ -214,23 +214,29 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           backgroundColor: const Color(0xFF1E3A8A),
           foregroundColor: Colors.white,
           elevation: 0,
-          titleSpacing: 12,
-          title: Text(
-            _t('app_title'),
-            style: TextStyle(
-              fontSize: screenWidth < 380 ? 13 : 15,
-              fontWeight: FontWeight.bold,
+          titleSpacing: 8,
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: Text(
+              _t('app_title'),
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           actions: [
-            _buildAppBarVisitorBadge(compact: screenWidth < 400),
+            _buildAppBarVisitorBadge(compact: screenWidth < 420),
             IconButton(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              constraints: const BoxConstraints(),
               icon: const Icon(Icons.headset_mic, color: Colors.white, size: 20),
               tooltip: _t('contact_us'),
               onPressed: () => _showContactUsDialog(context),
             ),
             PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(horizontal: 4),
               icon: const Icon(Icons.language, color: Colors.white, size: 20),
               onSelected: (String lang) {
                 setState(() {
@@ -257,7 +263,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               : SingleChildScrollView(
             child: Column(
               children: [
-                _buildBridgeInfoSection(height: 250),
+                _buildBridgeInfoSection(height: screenWidth < 380 ? 220 : 250),
                 _buildRegistrationSection(context),
               ],
             ),
@@ -270,7 +276,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget _buildAppBarVisitorBadge({bool compact = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
@@ -325,7 +331,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: Center(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 420),
             child: Form(
@@ -335,11 +341,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.stars_rounded, size: 38, color: Color(0xFF1E3A8A)),
+                  const Icon(Icons.stars_rounded, size: 36, color: Color(0xFF1E3A8A)),
                   const SizedBox(height: 8),
                   Text(
                     _t('welcome_title'),
-                    style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -366,20 +372,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width: 120,
+                        width: 110,
                         child: DropdownButtonFormField<String>(
                           value: _selectedCountryCode,
                           isExpanded: true,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 10),
                           ),
                           items: _countryCodes.map((country) {
                             return DropdownMenuItem<String>(
                               value: country['code'],
                               child: Text(
                                 '${country['flag']} ${country['code']}',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                                 textDirection: TextDirection.ltr,
                               ),
                             );
@@ -408,7 +414,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               hintText: _t('phone_hint'),
                               hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400),
                               border: const OutlineInputBorder(),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
@@ -440,11 +446,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     items: [
                       DropdownMenuItem(
                         value: 'ordinary',
-                        child: Text(_t('type_ordinary'), overflow: TextOverflow.ellipsis),
+                        child: Text(_t('type_ordinary'), overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
                       ),
                       DropdownMenuItem(
                         value: 'jerusalem',
-                        child: Text(_t('type_jerusalem'), overflow: TextOverflow.ellipsis),
+                        child: Text(_t('type_jerusalem'), overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
                       ),
                     ],
                     onChanged: (val) => setState(() => _passengerType = val!),
@@ -508,7 +514,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(_t('btn_next'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text(_t('btn_next'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                           const SizedBox(width: 8),
                           Icon(
                             _selectedLanguage == 'en' ? Icons.arrow_forward : Icons.arrow_back,
@@ -530,6 +536,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget _buildBridgeInfoSection({double? height}) {
     return Container(
       height: height,
+      width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [const Color(0xFF1E3A8A), Colors.blue.shade900],
@@ -550,30 +557,35 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(36.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD97706),
-                    borderRadius: BorderRadius.circular(20),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD97706),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(_t('badge'), style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                   ),
-                  child: Text(_t('badge'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  _t('bridge_name'),
-                  style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, height: 1.2),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  _t('bridge_desc'),
-                  style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.5),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  Text(
+                    _t('bridge_name'),
+                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold, height: 1.2),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _t('bridge_desc'),
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
