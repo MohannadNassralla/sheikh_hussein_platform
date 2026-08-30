@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home_screen.dart';
+import 'UserDashboardScreen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -15,6 +16,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passportController = TextEditingController(); // controller رقم الجواز
   final TextEditingController _passengersCountController = TextEditingController(text: '1');
 
   String _passengerType = 'ordinary';
@@ -36,6 +38,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'welcome_sub': 'يرجى إدخال معلوماتك الأساسية للاطلاع على كافة خدمات السفر والنقل المتوفرة.',
       'name_label': 'الاسم الكامل',
       'name_error': 'يرجى إدخال الاسم',
+      'passport_label': 'رقم جواز السفر',
+      'passport_error': 'يرجى إدخال رقم جواز السفر',
       'phone_label': 'رقم الهاتف (9 أرقام)',
       'phone_hint': '525980725',
       'phone_error_empty': 'يرجى إدخال رقم الهاتف',
@@ -46,6 +50,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'passengers_count': 'عدد المسافرين',
       'passengers_count_error': 'يرجى إدخال عدد المسافرين (1 أو أكثر)',
       'btn_next': 'الاطلاع على المنصة والخدمات',
+      'btn_dashboard': 'متابعة وإدارة حجوزاتي السابقة',
       'badge': 'المعبر الشمالي الأردني',
       'bridge_name': 'جسر الشيخ حسين\n(معبر نهر الأردن)',
       'bridge_desc': 'البوابة الشمالية الرئيسية للربط والنقل بين الأردن وإسرائيل. توفر المنصة خدمات حجز السيارات الخاصة، VIP، واستقبال الجروبات بكفاءة وسرعة.',
@@ -59,6 +64,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'welcome_sub': 'Please enter your basic info to explore available travel & transport services.',
       'name_label': 'Full Name',
       'name_error': 'Please enter your name',
+      'passport_label': 'Passport Number',
+      'passport_error': 'Please enter passport number',
       'phone_label': 'Phone Number (9 digits)',
       'phone_hint': '525980725',
       'phone_error_empty': 'Please enter phone number',
@@ -69,6 +76,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'passengers_count': 'Number of Passengers',
       'passengers_count_error': 'Please enter valid passengers count (1 or more)',
       'btn_next': 'Explore Platform & Services',
+      'btn_dashboard': 'My Bookings & Dashboard',
       'badge': 'Northern Jordan Border',
       'bridge_name': 'Sheikh Hussein Bridge\n(Jordan River Crossing)',
       'bridge_desc': 'The main northern border connecting Jordan and Israel. Providing private transport, VIP, and group services efficiently.',
@@ -82,6 +90,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'welcome_sub': 'אנא הזן את פרטיך הבסיסיים כדי לצפות בכל שירותי הנסיעות והתחבורה.',
       'name_label': 'שם מלא',
       'name_error': 'נא להזין שם',
+      'passport_label': 'מספר דרכון',
+      'passport_error': 'נא להזין מספר דרכון',
       'phone_label': 'מספר טלפון (9 ספרות)',
       'phone_hint': '525980725',
       'phone_error_empty': 'נא להזין מספר טלפון',
@@ -92,6 +102,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'passengers_count': 'מספר נוסעים',
       'passengers_count_error': 'נא להזין מספר נוסעים תקין (1 ומעלה)',
       'btn_next': 'לצפייה בשירותי הפלטפורמה',
+      'btn_dashboard': 'ניהול ומעקב אחר ההזמנות שלי',
       'badge': 'מעבר גבול צפון ירדן',
       'bridge_name': 'גשר שייח חוסיין\n(מעבר נהר הירדן)',
       'bridge_desc': 'מעבר הגבול הצפוני הראשי המחבר בין ירדן לישראל. מספק שירותי הסעות פרטיות, VIP וקבוצות ביעילות.',
@@ -124,6 +135,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _passportController.dispose();
     _passengersCountController.dispose();
     super.dispose();
   }
@@ -133,6 +145,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch $urlString');
     }
+  }
+
+  void _navigateToDashboard() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserDashboardScreen(
+          currentLanguage: _selectedLanguage,
+        ),
+      ),
+    );
   }
 
   void _showContactUsDialog(BuildContext context) {
@@ -225,6 +248,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.dashboard_outlined, color: Colors.white, size: 22),
+              tooltip: _t('btn_dashboard'),
+              onPressed: _navigateToDashboard,
+            ),
             if (screenWidth > 400)
               Flexible(
                 fit: FlexFit.loose,
@@ -365,6 +393,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   const SizedBox(height: 10),
 
+                  // رقم جواز السفر (الحقل الجديد)
+                  TextFormField(
+                    controller: _passportController,
+                    decoration: InputDecoration(
+                      labelText: _t('passport_label'),
+                      prefixIcon: const Icon(Icons.menu_book_outlined),
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                    validator: (value) => value == null || value.trim().isEmpty ? _t('passport_error') : null,
+                  ),
+                  const SizedBox(height: 10),
+
                   // رقم الهاتف
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,7 +522,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // زر الانتقال
+                  // زر الانتقال للصفحة الرئيسية
                   SizedBox(
                     width: double.infinity,
                     height: 44,
@@ -501,6 +542,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               builder: (context) => HomeScreen(
                                 userName: _nameController.text.trim(),
                                 userPhone: fullPhoneNumber,
+                                passportNumber: _passportController.text.trim(), // تم تمرير رقم الجواز هنا
                                 passengerType: _passengerType,
                                 passengersCount: int.parse(_passengersCountController.text.trim()),
                                 initialLanguage: _selectedLanguage,
@@ -519,6 +561,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             size: 18,
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // زر متابعة الحجوزات
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF1E3A8A),
+                        side: const BorderSide(color: Color(0xFF1E3A8A)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: _navigateToDashboard,
+                      icon: const Icon(Icons.confirmation_number_outlined, size: 18),
+                      label: Text(
+                        _t('btn_dashboard'),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),

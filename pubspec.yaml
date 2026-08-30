@@ -11,7 +11,6 @@ dependencies:
   flutter:
     sdk: flutter
   url_launcher: ^6.2.1
-
   cupertino_icons: ^1.0.8
   flutter_localizations:
     sdk: flutter
@@ -19,6 +18,9 @@ dependencies:
   # --- إضافات Firebase المطلوبة ---
   firebase_core: ^3.1.0
   cloud_firestore: ^5.0.0
+
+  # --- مكتبة الخطوط الرسمية ---
+  google_fonts: ^8.2.1
 
 dev_dependencies:
   flutter_test:
@@ -28,11 +30,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # مسار مجلد الأصول
+  # تحديد مسار ملفات الأصول والخط المحلي
   assets:
+    - assets/
     - assets/fonts/
 
-  # تعريف خط Cairo
   fonts:
     - family: Cairo
       fonts:

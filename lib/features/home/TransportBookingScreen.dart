@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TransportBookingScreen extends StatefulWidget {
   final String userName;
   final String userPhone;
+  final String passportNumber; // <--- تم إضافة استقبال رقم الجواز
   final String passengerType;
   final int passengersCount;
   final String currentLanguage;
@@ -12,6 +13,7 @@ class TransportBookingScreen extends StatefulWidget {
     super.key,
     required this.userName,
     required this.userPhone,
+    required this.passportNumber, // <--- حقل مطلوب
     required this.passengerType,
     required this.passengersCount,
     required this.currentLanguage,
@@ -58,6 +60,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
     'ar': {
       'page_title': 'حجز النقل والتأشيرة والمندوب VIP',
       'user_summary': 'بيانات المسافر:',
+      'passport_no': 'رقم الجواز:',
       'passengers_count': 'عدد المسافرين:',
       'mandatory_fee_notice': 'ملاحظة: خدمة المندوب VIP وتأشيرة الدخول إجبارية ($visaAndEscortFeePerPerson دينار/شخص)',
       'vehicle_type': 'وسيلة النقل',
@@ -88,6 +91,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
     'en': {
       'page_title': 'Transport, Visa & VIP Escort Booking',
       'user_summary': 'Passenger Details:',
+      'passport_no': 'Passport No:',
       'passengers_count': 'Passengers Count:',
       'mandatory_fee_notice': 'Note: VIP Escort & Entry Visa are mandatory ($visaAndEscortFeePerPerson JOD/person)',
       'vehicle_type': 'Vehicle Type',
@@ -118,6 +122,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
     'he': {
       'page_title': 'הזמנת הסעות, ויזה ונציג מלווה VIP',
       'user_summary': 'פרטי הנוסע:',
+      'passport_no': 'מספר דרכון:',
       'passengers_count': 'מספר נוסעים:',
       'mandatory_fee_notice': 'הערה: נציג מלווה VIP וויזת כניסה הם חובה ($visaAndEscortFeePerPerson דינר לנוסע)',
       'vehicle_type': 'סוג רכב',
@@ -200,6 +205,7 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
         await FirebaseFirestore.instance.collection('transport_bookings').add({
           'userName': widget.userName,
           'userPhone': widget.userPhone,
+          'passportNumber': widget.passportNumber, // <--- حفظ رقم الجواز في فايبربيس
           'passengerType': widget.passengerType,
           'passengersCount': widget.passengersCount,
           'vehicleType': _selectedVehicle,
@@ -269,6 +275,9 @@ class _TransportBookingScreenState extends State<TransportBookingScreen> {
                           Text(_t('user_summary'), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A))),
                           const SizedBox(height: 6),
                           Text('👤 ${widget.userName} | 📞 ${widget.userPhone}'),
+                          const SizedBox(height: 4),
+                          Text('📄 ${_t('passport_no')} ${widget.passportNumber}'), // <--- عرض رقم الجواز
+                          const SizedBox(height: 4),
                           Text('👥 ${_t('passengers_count')} ${widget.passengersCount}'),
                           const Divider(height: 16),
                           Text(

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'transportbookingscreen.dart';
-import 'hotelbookingscreen.dart';
+import 'TransportBookingScreen.dart'; // <--- تم تعديل حالة الأحرف هنا
+import 'HotelBookingScreen.dart';     // <--- تم تعديل حالة الأحرف هنا
 
 class HomeScreen extends StatefulWidget {
   final String userName;
   final String userPhone;
+  final String passportNumber;
   final String passengerType;
   final int passengersCount;
   final String initialLanguage;
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
     super.key,
     required this.userName,
     required this.userPhone,
+    required this.passportNumber,
     required this.passengerType,
     required this.passengersCount,
     this.initialLanguage = 'ar',
@@ -39,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'welcome_user': 'أهلاً بك، ',
       'home_sub': 'تصفح كافة الخدمات المتاحة لمعبر الشيخ حسين وقم بتقديم طلبك بسهولة.',
       'passengers_info': 'عدد المسافرين المسجل: ',
+      'passport_info': 'رقم الجواز: ',
       'services_title': 'الخدمات المتاحة',
       'transport_visa_escort_service': 'خدمة تأشيرة الدخول مع مندوب ووسيلة النقل',
       'transport_visa_escort_desc': 'توفير خدمات المندوب، إصدار التأشيرات، وحجز وسائط النقل (سيارات خاصة، فان) أو بدون نقل.',
@@ -53,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'welcome_user': 'Welcome, ',
       'home_sub': 'Browse all available services for Sheikh Hussein crossing and submit your request.',
       'passengers_info': 'Registered Passengers: ',
+      'passport_info': 'Passport No: ',
       'services_title': 'Available Services',
       'transport_visa_escort_service': 'Entry Visa, Escort & Transport Service',
       'transport_visa_escort_desc': 'Providing escort assistance, entry visa processing, and transport bookings (private cars, vans) or visa only.',
@@ -67,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'welcome_user': 'ברוך הבא, ',
       'home_sub': 'עיין בכל השירותים הזמינים במעבר שייח חוסיין ושלח את בקשתך בקלות.',
       'passengers_info': 'מספר נוסעים רשום: ',
+      'passport_info': 'מספר דרכון: ',
       'services_title': 'שירותים זמינים',
       'transport_visa_escort_service': 'שירות ויזת כניסה, נציג מלווה ותחבורה',
       'transport_visa_escort_desc': 'אספקת שירותי נציג מלווה, הנפקת ויזות והזמנת הסעות (רכבים פרטיים, ואנים) או ללא הסעה.',
@@ -174,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
             overflow: TextOverflow.ellipsis,
           ),
           actions: [
-            // زر الاتصال في الهيدر تم تبسيطه لضمان عدم ضغط العنوان
             IconButton(
               icon: const Icon(Icons.headset_mic, color: Colors.white, size: 20),
               tooltip: _t('contact_us'),
@@ -203,7 +207,6 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // الهيدر الترحيبي
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20.0),
@@ -228,16 +231,33 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: const TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                       const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${_t('passengers_info')}${widget.passengersCount}',
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
-                        ),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${_t('passengers_info')}${widget.passengersCount}',
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${_t('passport_info')}${widget.passportNumber}',
+                              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -254,7 +274,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 14),
 
-                // خدمة التأشيرة والنقل
                 _buildResponsiveServiceCard(
                   icon: Icons.assignment_ind_rounded,
                   title: _t('transport_visa_escort_service'),
@@ -266,6 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context) => TransportBookingScreen(
                           userName: widget.userName,
                           userPhone: widget.userPhone,
+                          passportNumber: widget.passportNumber,
                           passengerType: widget.passengerType,
                           passengersCount: widget.passengersCount,
                           currentLanguage: _selectedLanguage,
@@ -276,7 +296,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // خدمة الفنادق
                 _buildResponsiveServiceCard(
                   icon: Icons.hotel_rounded,
                   title: _t('hotel_service'),
@@ -288,6 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context) => HotelBookingScreen(
                           userName: widget.userName,
                           userPhone: widget.userPhone,
+                          passportNumber: widget.passportNumber,
                           passengerType: widget.passengerType,
                           passengersCount: widget.passengersCount,
                           currentLanguage: _selectedLanguage,
@@ -304,7 +324,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // بطاقة خدمة متجاوبة تعمل بكفاءة على الشاشات الصغرى والكبرى بكل اللغات
   Widget _buildResponsiveServiceCard({
     required IconData icon,
     required String title,

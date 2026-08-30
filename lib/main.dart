@@ -6,10 +6,13 @@ import 'features/home/welcome_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // تمرير الـ options إجباري لبيئة Web
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint("Firebase init error: $e");
+  }
 
   runApp(const SheikhHusseinApp());
 }
@@ -24,14 +27,8 @@ class SheikhHusseinApp extends StatelessWidget {
       title: 'Sheikh Hussein Border Platform',
       theme: ThemeData(
         primaryColor: const Color(0xFF1E3A8A),
+        // استخدام اسم الخط المحلي المباشر بدون fallback
         fontFamily: 'Cairo',
-        // استخدام خطوط نظام بديلة يدعم معظمها اللغة العربية فوراً لحين اكتمال التحميل الشبكي
-        fontFamilyFallback: const [
-          'Segoe UI',
-          'Tahoma',
-          'Arial',
-          'sans-serif',
-        ],
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF1E3A8A),
         ),

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class HotelBookingScreen extends StatefulWidget {
   final String userName;
   final String userPhone;
+  final String passportNumber; // <--- تم إضافة استقبال رقم الجواز
   final String passengerType;
   final int passengersCount;
   final String currentLanguage;
@@ -12,6 +13,7 @@ class HotelBookingScreen extends StatefulWidget {
     super.key,
     required this.userName,
     required this.userPhone,
+    required this.passportNumber, // <--- حقل مطلوب
     required this.passengerType,
     required this.passengersCount,
     required this.currentLanguage,
@@ -72,6 +74,7 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
     'ar': {
       'page_title': 'حجز الفنادق والإقامة',
       'user_summary': 'بيانات المسافر:',
+      'passport_no': 'رقم الجواز:',
       'hotel_select': 'اختر الفندق / المنطقة',
       'hotel_siraj': 'فندق سراج عمان (شامل الإفطار والضريبة)',
       'hotel_days_inn': 'فندق دايز إن عمان (شامل الإفطار والعشاء + بركة سباحة والضريبة)',
@@ -101,6 +104,7 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
     'en': {
       'page_title': 'Hotel & Accommodation Booking',
       'user_summary': 'Passenger Details:',
+      'passport_no': 'Passport No:',
       'hotel_select': 'Select Hotel / Area',
       'hotel_siraj': 'Siraj Amman Hotel (Breakfast & Tax Included)',
       'hotel_days_inn': 'Days Inn Hotel Amman (Half Board: Breakfast & Dinner + Pool Included)',
@@ -130,6 +134,7 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
     'he': {
       'page_title': 'הזמנת מלונות ואירוח',
       'user_summary': 'פרטי הנוסע:',
+      'passport_no': 'מספר דרכון:',
       'hotel_select': 'בחר מלון / אזור',
       'hotel_siraj': 'מלון סיראג\' עמאן (כולל ארוחת בוקר ומע"מ)',
       'hotel_days_inn': 'מלון דייז אין עמאן (כולל ארוחת בוקר, ערב ובריכה)',
@@ -222,6 +227,7 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
         await FirebaseFirestore.instance.collection('hotel_bookings').add({
           'userName': widget.userName,
           'userPhone': widget.userPhone,
+          'passportNumber': widget.passportNumber, // <--- حفظ رقم الجواز في فايبربيس
           'passengerType': widget.passengerType,
           'passengersCount': widget.passengersCount,
           'hotelName': _selectedHotel,
@@ -303,6 +309,8 @@ class _HotelBookingScreenState extends State<HotelBookingScreen> {
                           Text(_t('user_summary'), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A))),
                           const SizedBox(height: 6),
                           Text('👤 ${widget.userName} | 📞 ${widget.userPhone}'),
+                          const SizedBox(height: 4),
+                          Text('📄 ${_t('passport_no')} ${widget.passportNumber}'), // <--- عرض رقم الجواز
                         ],
                       ),
                     ),
