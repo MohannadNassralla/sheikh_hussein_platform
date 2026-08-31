@@ -56,9 +56,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
       'nightsCount': ' | عدد الليالي: ',
       'passengersCount': 'المسافرين: ',
       'vehicleType': ' | وسيلة النقل: ',
+      'tripDirection': 'اتجاه الرحلة: ',
       'totalPrice': 'المجموع: ',
       'currency': ' دينار أردني',
       'rejectionReason': 'سبب الرفض: ',
+      'cancellationReason': 'سبب الإلغاء: ',
       'btnCancel': 'إلغاء الحجز',
       'cantCancel': '⚠️ لا يمكن الإلغاء (أقل من 48 ساعة على الموعد)',
       'confirmCancelTitle': 'تأكيد الإلغاء',
@@ -98,9 +100,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
       'nightsCount': ' | Nights: ',
       'passengersCount': 'Passengers: ',
       'vehicleType': ' | Vehicle: ',
+      'tripDirection': 'Trip Direction: ',
       'totalPrice': 'Total Price: ',
       'currency': ' JOD',
       'rejectionReason': 'Rejection Reason: ',
+      'cancellationReason': 'Cancellation Reason: ',
       'btnCancel': 'Cancel Booking',
       'cantCancel': '⚠️ Cannot cancel (less than 48 hours remaining)',
       'confirmCancelTitle': 'Confirm Cancellation',
@@ -140,9 +144,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
       'nightsCount': ' | מספר לילות: ',
       'passengersCount': 'נוסעים: ',
       'vehicleType': ' | סוג רכב: ',
+      'tripDirection': 'כיוון נסיעה: ',
       'totalPrice': 'סה"כ לתשלום: ',
       'currency': ' JOD',
       'rejectionReason': 'סיבת הדחייה: ',
+      'cancellationReason': 'סיבת הביטול: ',
       'btnCancel': 'בטל הזמנה',
       'cantCancel': '⚠️ לא ניתן לבטל (פחות מ-48 שעות למועד)',
       'confirmCancelTitle': 'אישור ביטול',
@@ -270,7 +276,6 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
             ),
           ],
         ),
-        // تم استخدام SingleChildScrollView لتفعيل السكرول على الشاشة كاملة
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(16.0),
@@ -374,7 +379,6 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
                 ),
                 const SizedBox(height: 12),
 
-                // تم استخدام SizedBox بارتفاع محدد يحتوي TabBarView مع تمرير القائمة
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.6,
                   child: TabBarView(
@@ -433,7 +437,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
             Expanded(
               child: ListView.builder(
                 shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(), // تفعيل السكرول بداخل القائمة
+                physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: docs.length,
                 itemBuilder: (context, index) {
                   final data = docs[index].data() as Map<String, dynamic>;
@@ -446,6 +450,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
                   final bool canCancel = status != 'cancelled' &&
                       status != 'rejected' &&
                       _canCancelBooking(bookingDate);
+
+                  final String direction = data['direction'] ??
+                      data['tripDirection'] ??
+                      data['route'] ??
+                      data['destination'] ??
+                      _getText('notSpecified');
 
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
@@ -475,13 +485,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
                             Text('${_getText('hotelName')}${data['hotelName'] ?? _getText('notSpecified')}'),
                             Text('${_getText('roomsCount')}${data['roomsCount'] ?? 1}${_getText('nightsCount')}${data['nightsCount'] ?? 1}'),
                           ] else ...[
+                            Text('${_getText('tripDirection')}$direction'),
                             Text('${_getText('passengersCount')}${data['passengersCount'] ?? 1}${_getText('vehicleType')}${data['vehicleType'] ?? _getText('private')}'),
                           ],
 
                           if (data['totalPrice'] != null)
                             Text('${_getText('totalPrice')}${data['totalPrice']}${_getText('currency')}', style: const TextStyle(fontWeight: FontWeight.w600)),
 
-                          if (status == 'rejected' && data['rejectionReason'] != null) ...[
+                          if (data['rejectionReason'] != null && data['rejectionReason'].toString().trim().isNotEmpty) ...[
                             const SizedBox(height: 8),
                             Container(
                               padding: const EdgeInsets.all(8),
@@ -489,7 +500,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
                               color: Colors.red.shade50,
                               child: Text(
                                 '${_getText('rejectionReason')}${data['rejectionReason']}',
-                                style: TextStyle(color: Colors.red.shade900, fontSize: 13),
+                                style: TextStyle(color: Colors.red.shade900, fontSize: 13, fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ],
+
+                          if (data['cancellationReason'] != null && data['cancellationReason'].toString().trim().isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              width: double.infinity,
+                              color: Colors.grey.shade200,
+                              child: Text(
+                                '${_getText('cancellationReason')}${data['cancellationReason']}',
+                                style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500),
                               ),
                             ),
                           ],
