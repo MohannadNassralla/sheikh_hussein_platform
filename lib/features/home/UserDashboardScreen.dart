@@ -165,6 +165,44 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
     return _localizedStrings[_selectedLanguage]?[key] ?? _localizedStrings['ar']![key]!;
   }
 
+  // دالة لتكييف ترجمة أسباب الإلغاء أو الرفض
+  String _getLocalizedReason(dynamic reasonData) {
+    if (reasonData == null) return '';
+
+    // في حال كان السجل في Firestore عبارة عن Map يحتوي اللغات
+    if (reasonData is Map) {
+      return reasonData[_selectedLanguage] ?? reasonData['ar'] ?? reasonData.values.first.toString();
+    }
+
+    final String reasonStr = reasonData.toString().trim();
+    if (reasonStr.isEmpty) return '';
+
+    // قاموس ترجمة الأسباب النصية المخزنة بالعربية
+    final Map<String, Map<String, String>> reasonDictionary = {
+      'لا يوجد حجوزات': {
+        'ar': 'لا يوجد حجوزات',
+        'en': 'No bookings available',
+        'he': 'אין הזמנות זמינות',
+      },
+      'تم الإلغاء بناءً على طلب المسافر': {
+        'ar': 'تم الإلغاء بناءً على طلب المسافر',
+        'en': 'Cancelled upon passenger request',
+        'he': 'בוטל לבקשת הנוסע',
+      },
+      'عدم اكتمال البيانات': {
+        'ar': 'عدم اكتمال البيانات',
+        'en': 'Incomplete details',
+        'he': 'פרטים לא מלאים',
+      },
+    };
+
+    if (reasonDictionary.containsKey(reasonStr)) {
+      return reasonDictionary[reasonStr]?[_selectedLanguage] ?? reasonStr;
+    }
+
+    return reasonStr;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -499,7 +537,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
                               width: double.infinity,
                               color: Colors.red.shade50,
                               child: Text(
-                                '${_getText('rejectionReason')}${data['rejectionReason']}',
+                                '${_getText('rejectionReason')}${_getLocalizedReason(data['rejectionReason'])}',
                                 style: TextStyle(color: Colors.red.shade900, fontSize: 13, fontWeight: FontWeight.w500),
                               ),
                             ),
@@ -512,7 +550,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> with SingleTi
                               width: double.infinity,
                               color: Colors.grey.shade200,
                               child: Text(
-                                '${_getText('cancellationReason')}${data['cancellationReason']}',
+                                '${_getText('cancellationReason')}${_getLocalizedReason(data['cancellationReason'])}',
                                 style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500),
                               ),
                             ),
